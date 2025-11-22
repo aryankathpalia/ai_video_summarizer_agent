@@ -1,0 +1,18 @@
+# Ignore environment variables
+.env
+
+# Temp directories
+temp_videos/
+temp_video.file/
+__pycache__/
+.vscode/
+
+# Virtual environment
+.venv/
+
+# Streamlit cache
+.streamlit/
+
+# OS files
+.DS_Store
+Thumbs.db
