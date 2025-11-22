@@ -1,27 +1,26 @@
 import streamlit as st
 import os
-import time
 import base64
 import yt_dlp
 import hashlib
 from main import video_to_summary
 from transcriber import extract_audio, transcribe_audio
 
-# === PAGE CONFIG ===
+# page config
 st.set_page_config(page_title="Vistoria", page_icon="🎧", layout="wide")
 
-# === LOAD CSS ===
+# loading css
 with open("style.css", "r", encoding="utf-8") as f:
     st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
-# === ENCODE LOGO ===
+# logo part
 def get_base64_image(image_path):
     with open(image_path, "rb") as f:
         return base64.b64encode(f.read()).decode()
 
 logo_base64 = get_base64_image("assets/logo.png")
 
-# === HEADER / HERO ===
+# header
 st.markdown(
     f"""
 <div class="header">
@@ -37,9 +36,8 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# --- rest of your app (examples, uploader, main logic) should follow here ---
-# If you want, I can paste the rest of your working app code beneath this header block.
 
+# hero-section
 st.markdown(
     """
 <div class="hero-section">
@@ -53,7 +51,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# === EXAMPLES ===
+# example section
 examples_html = """
 <style>
 .examples { display:flex; gap:18px; justify-content:center; flex-wrap:wrap; margin:6px 0 10px; }
@@ -125,7 +123,7 @@ examples_html = """
 </script>
 """
 
-# === CUSTOM UPLOAD UI ===
+# custom upload box
 def render_upload_box_default():
     st.markdown(
         """
@@ -185,10 +183,10 @@ def main():
 
 
 
-    # --- EXAMPLES + URL INPUT ---
+    # example + url input
     with st.container():
         st.components.v1.html(examples_html, height=240, scrolling=False)
-        # note: we give the widget a key, but we will never write to st.session_state[URL_WIDGET_KEY]
+        # gave the widget a key, but will never write to st.session_state[URL_WIDGET_KEY]
         video_url = st.text_input(
             "",
             placeholder="Paste a video URL (YouTube, Vimeo, etc)",
@@ -196,7 +194,7 @@ def main():
         ).strip()
 
 
-    # --- FILE UPLOADER (read-only key) ---
+    # file uploader(read only)
     uploaded_file = st.file_uploader(
         "Upload Video",
         type=["mp4", "mov", "avi", "mkv"],
@@ -233,14 +231,14 @@ def main():
 
 
 
-    # --- Render upload box UI (external helpers) ---
+    # Render upload box UI (external helpers) 
     # Use the widget values to decide which UI to show
     if not uploaded_file:
         render_upload_box_default()
     else:
         render_upload_box_with_filename(uploaded_file.name) 
 
-    # --- JS hook for custom upload button (kept from original) ---
+    # JS hook for custom upload button 
     st.components.v1.html("""
         <script>
         (function() {
@@ -295,17 +293,17 @@ def main():
         else:
             video_path = upload_path
 
-    # --- Determine if video is ready ---
+    # Determine if video is ready 
     video_ready = video_path is not None and os.path.exists(video_path)
 
-    # --- Action buttons ---
+    # Action buttons 
     col1, col2 = st.columns(2)
     with col1:
         generate_transcript = st.button("📝 Generate Transcript", use_container_width=True, disabled=not video_ready)
     with col2:
         generate_summary = st.button("✨ Generate Summary", use_container_width=True, disabled=not video_ready)
 
-    # --- Disabled style (cosmetic) ---
+    # Disabled style
     st.markdown("""
         <style>
         div.stButton > button:disabled {
@@ -318,7 +316,7 @@ def main():
         </style>
     """, unsafe_allow_html=True)
 
-    # --- Processing ---
+    # Processing 
     if video_ready:
         audio_path = f"{mode}_temp_audio.wav"
 
@@ -349,7 +347,7 @@ def main():
                 except Exception as e:
                     st.error(f"❌ Summary failed: {e}")
 
-        # --- Show results if present ---
+        # Show results if present 
         if st.session_state.get(f"{mode}_summary_result"):
             st.markdown("<div class='section-card'>", unsafe_allow_html=True)
             st.subheader("📄 Summary")
@@ -372,6 +370,6 @@ def main():
                     )
 
 
-# === ENTRY POINT ===
+# ENTRY POINT 
 if __name__ == "__main__":
     main()
